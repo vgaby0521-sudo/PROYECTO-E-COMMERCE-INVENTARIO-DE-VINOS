@@ -1,0 +1,146 @@
+{% extends "crud/base_crud.html" %}
+
+{% block crud_title %}Confirmar Eliminación{% endblock %}
+
+{% block crud_content %}
+<style>
+    .delete-container {
+        background: white;
+        padding: 3rem;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        max-width: 500px;
+        margin: 2rem auto;
+        text-align: center;
+    }
+
+    .delete-icon {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        color: #e74c3c;
+    }
+
+    .delete-title {
+        font-size: 1.8rem;
+        color: #722f37;
+        margin-bottom: 1rem;
+    }
+
+    .delete-message {
+        color: #666;
+        margin-bottom: 1rem;
+        font-size: 1.1rem;
+    }
+
+    .delete-item-info {
+        background: #fadbd8;
+        padding: 1.5rem;
+        border-radius: 5px;
+        margin: 1.5rem 0;
+        border-left: 4px solid #e74c3c;
+    }
+
+    .delete-item-info strong {
+        color: #722f37;
+    }
+
+    .warning-text {
+        color: #e74c3c;
+        font-weight: 600;
+        margin: 1rem 0;
+    }
+
+    .delete-actions {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        margin-top: 2rem;
+        flex-wrap: wrap;
+    }
+
+    .btn-confirm-delete {
+        background: #e74c3c;
+        color: white;
+        padding: 0.75rem 2rem;
+        border: none;
+        border-radius: 5px;
+        font-size: 0.95rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .btn-confirm-delete:hover {
+        background: #c0392b;
+        transform: translateY(-2px);
+    }
+
+    .btn-cancel {
+        background: #95a5a6;
+        color: white;
+        padding: 0.75rem 2rem;
+        border: none;
+        border-radius: 5px;
+        font-size: 0.95rem;
+        font-weight: 600;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-block;
+        transition: all 0.3s ease;
+    }
+
+    .btn-cancel:hover {
+        background: #7f8c8d;
+        transform: translateY(-2px);
+    }
+
+    @media (max-width: 768px) {
+        .delete-container {
+            padding: 1.5rem;
+        }
+
+        .delete-title {
+            font-size: 1.5rem;
+        }
+
+        .delete-actions {
+            flex-direction: column;
+        }
+
+        .btn-confirm-delete, .btn-cancel {
+            width: 100%;
+        }
+    }
+</style>
+
+<div class="delete-container">
+    <div class="delete-icon">⚠️</div>
+    <h2 class="delete-title">Confirmar Eliminación</h2>
+    <p class="delete-message">¿Estás seguro de que deseas eliminar este elemento?</p>
+
+    <div class="delete-item-info">
+        {% if producto %}
+        <p><strong>Producto:</strong> {{ producto.nombre }}</p>
+        {% elif proveedor %}
+        <p><strong>Proveedor:</strong> {{ proveedor.nombre }}</p>
+        {% elif pedido %}
+        <p><strong>Pedido:</strong> #{{ pedido.id }}</p>
+        {% elif cliente %}
+        <p><strong>Cliente:</strong> {{ cliente.nombre_completo }}</p>
+        {% elif usuario %}
+        <p><strong>Usuario:</strong> {{ usuario.username }}</p>
+        {% endif %}
+    </div>
+
+    <p class="warning-text">⚠️ Esta acción no se puede deshacer.</p>
+
+    <div class="delete-actions">
+        <form method="POST" style="display: inline;">
+            {% csrf_token %}
+            <button type="submit" class="btn-confirm-delete">Sí, Eliminar</button>
+        </form>
+        <a href="javascript:history.back()" class="btn-cancel">Cancelar</a>
+    </div>
+</div>
+
+{% endblock %}

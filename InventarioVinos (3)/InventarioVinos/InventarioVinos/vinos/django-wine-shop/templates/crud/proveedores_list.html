@@ -1,0 +1,54 @@
+{% extends "crud/base_crud.html" %}
+
+{% block crud_title %}Gestión de Proveedores{% endblock %}
+
+{% block crud_content %}
+<div class="crud-header">
+    <h1 class="crud-title">🚚 Proveedores</h1>
+    <div class="crud-actions">
+        <a href="{% url 'proveedor_create' %}" class="btn btn-primary">+ Nuevo Proveedor</a>
+        <a href="{% url 'admin_panel' %}" class="btn btn-secondary">← Panel Admin</a>
+    </div>
+</div>
+
+{% if proveedores %}
+<div class="table-container">
+    <table>
+        <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>Correo</th>
+                <th>Teléfono</th>
+                <th>Dirección</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for proveedor in proveedores %}
+            <tr>
+                <td><strong>{{ proveedor.nombre }}</strong></td>
+                <td>{{ proveedor.correo }}</td>
+                <td>{{ proveedor.telefono }}</td>
+                <td>{{ proveedor.direccion|truncatewords:5 }}</td>
+                <td>
+                    <div class="action-buttons">
+                        <a href="{% url 'proveedor_edit' proveedor.id %}" class="btn-small btn-edit">Editar</a>
+                        <a href="{% url 'proveedor_delete' proveedor.id %}" class="btn-small btn-delete">Eliminar</a>
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<div class="table-container">
+    <div class="empty-state">
+        <div class="empty-state-icon">📭</div>
+        <p>No hay proveedores registrados</p>
+        <a href="{% url 'proveedor_create' %}" class="btn btn-primary" style="margin-top: 1rem;">+ Crear Primer Proveedor</a>
+    </div>
+</div>
+{% endif %}
+
+{% endblock %}

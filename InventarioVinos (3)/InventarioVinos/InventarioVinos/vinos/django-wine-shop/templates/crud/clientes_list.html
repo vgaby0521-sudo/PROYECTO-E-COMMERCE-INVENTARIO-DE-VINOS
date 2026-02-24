@@ -1,0 +1,58 @@
+{% extends "crud/base_crud.html" %}
+
+{% block crud_title %}Gestión de Clientes{% endblock %}
+
+{% block crud_content %}
+<div class="crud-header">
+    <h1 class="crud-title">👥 Clientes</h1>
+    <div class="crud-actions">
+        <a href="{% url 'cliente_create' %}" class="btn btn-primary">+ Nuevo Cliente</a>
+        <a href="{% url 'admin_panel' %}" class="btn btn-secondary">← Panel Admin</a>
+    </div>
+</div>
+
+{% if clientes %}
+<div class="table-container">
+    <table>
+        <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>Usuario</th>
+                <th>Correo</th>
+                <th>Teléfono</th>
+                <th>Ciudad</th>
+                <th>Puntos</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for cliente in clientes %}
+            <tr>
+                <td><strong>{{ cliente.nombre_completo }}</strong></td>
+                <td>{{ cliente.usuario.username }}</td>
+                <td>{{ cliente.usuario.email }}</td>
+                <td>{{ cliente.telefono|default:"—" }}</td>
+                <td>{{ cliente.ciudad|default:"—" }}</td>
+                <td>{{ cliente.puntos_recompensa }}</td>
+                <td>
+                    <div class="action-buttons">
+                        <a href="{% url 'cliente_edit' cliente.id %}" class="btn-small btn-edit">Editar</a>
+                        <a href="{% url 'cliente_delete' cliente.id %}" class="btn-small btn-delete">Eliminar</a>
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<div class="table-container">
+    <div class="empty-state">
+        <div class="empty-state-icon">📭</div>
+        <p>No hay clientes registrados</p>
+        <a href="{% url 'cliente_create' %}" class="btn btn-primary" style="margin-top: 1rem;">+ Crear Primer Cliente</a>
+    </div>
+</div>
+{% endif %}
+
+{% endblock %}

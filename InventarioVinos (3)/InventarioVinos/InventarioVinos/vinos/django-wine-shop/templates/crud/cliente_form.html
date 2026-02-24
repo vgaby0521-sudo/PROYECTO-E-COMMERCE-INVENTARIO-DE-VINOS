@@ -1,0 +1,198 @@
+{% extends "crud/base_crud.html" %}
+
+{% block crud_title %}{% if cliente %}Editar{% else %}Crear{% endif %} Cliente{% endblock %}
+
+{% block crud_content %}
+<style>
+    .form-container {
+        background: white;
+        padding: 2rem;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        max-width: 600px;
+        margin: 0 auto;
+    }
+
+    .form-title {
+        font-size: 1.8rem;
+        color: #722f37;
+        margin-bottom: 2rem;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-row {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+    }
+
+    label {
+        display: block;
+        margin-bottom: 0.5rem;
+        color: #722f37;
+        font-weight: 600;
+    }
+
+    input, textarea {
+        width: 100%;
+        padding: 0.75rem;
+        border: 2px solid #ddd;
+        border-radius: 5px;
+        font-family: 'Playfair Display', serif;
+        font-size: 0.95rem;
+        transition: border-color 0.3s ease;
+    }
+
+    input:focus, textarea:focus {
+        outline: none;
+        border-color: #722f37;
+        box-shadow: 0 0 0 3px rgba(114, 47, 55, 0.1);
+    }
+
+    textarea {
+        resize: vertical;
+        min-height: 100px;
+    }
+
+    .section-title {
+        font-size: 1.1rem;
+        color: #722f37;
+        margin-top: 1.5rem;
+        margin-bottom: 1rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid #ddd;
+    }
+
+    .form-actions {
+        display: flex;
+        gap: 1rem;
+        margin-top: 2rem;
+        flex-wrap: wrap;
+    }
+
+    .btn-submit {
+        background: #27ae60;
+        color: white;
+        padding: 0.75rem 2rem;
+        border: none;
+        border-radius: 5px;
+        font-size: 0.95rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .btn-submit:hover {
+        background: #229954;
+        transform: translateY(-2px);
+    }
+
+    .btn-cancel {
+        background: #95a5a6;
+        color: white;
+        padding: 0.75rem 2rem;
+        border: none;
+        border-radius: 5px;
+        font-size: 0.95rem;
+        font-weight: 600;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-block;
+        transition: all 0.3s ease;
+    }
+
+    .btn-cancel:hover {
+        background: #7f8c8d;
+        transform: translateY(-2px);
+    }
+
+    .readonly-field {
+        background: #f5f5f5;
+        padding: 0.75rem;
+        border-radius: 5px;
+        border: 2px solid #ddd;
+    }
+
+    @media (max-width: 768px) {
+        .form-container {
+            padding: 1rem;
+        }
+
+        .form-row {
+            grid-template-columns: 1fr;
+        }
+
+        .form-actions {
+            flex-direction: column;
+        }
+
+        .btn-submit, .btn-cancel {
+            width: 100%;
+            text-align: center;
+        }
+    }
+</style>
+
+<div class="form-container">
+    <h2 class="form-title">
+        {% if cliente %}✏️ Editar Cliente{% else %}➕ Crear Cliente{% endif %}
+    </h2>
+
+    <form method="POST">
+        {% csrf_token %}
+
+        <div class="section-title">Información Personal</div>
+        {% if not cliente %}
+        <div class="form-group">
+            <label for="username">Nombre de Usuario *</label>
+            <input type="text" id="username" name="username" required>
+        </div>
+
+        <div class="form-group">
+            <label for="password">Contraseña *</label>
+            <input type="password" id="password" name="password" required>
+        </div>
+        {% endif %}
+
+        <div class="form-group">
+            <label for="nombre_completo">Nombre Completo *</label>
+            <input type="text" id="nombre_completo" name="nombre_completo" required value="{{ cliente.nombre_completo|default:'' }}">
+        </div>
+
+        <div class="form-group">
+            <label for="email">Correo *</label>
+            <input type="email" id="email" name="email" required value="{{ cliente.usuario.email|default:'' }}">
+        </div>
+
+        <div class="form-group">
+            <label for="telefono">Teléfono</label>
+            <input type="tel" id="telefono" name="telefono" value="{{ cliente.telefono|default:'' }}">
+        </div>
+
+        <div class="section-title">Dirección</div>
+        <div class="form-group">
+            <label for="direccion">Dirección</label>
+            <textarea id="direccion" name="direccion">{{ cliente.direccion|default:'' }}</textarea>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label for="ciudad">Ciudad</label>
+                <input type="text" id="ciudad" name="ciudad" value="{{ cliente.ciudad|default:'' }}">
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn-submit">{% if cliente %}Actualizar{% else %}Crear{% endif %} Cliente</button>
+            <a href="{% url 'clientes_list' %}" class="btn-cancel">Cancelar</a>
+        </div>
+    </form>
+</div>
+
+{% endblock %}

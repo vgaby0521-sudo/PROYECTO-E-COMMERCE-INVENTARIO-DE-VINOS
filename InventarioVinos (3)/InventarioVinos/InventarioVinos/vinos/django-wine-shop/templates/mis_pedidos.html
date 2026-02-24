@@ -1,0 +1,256 @@
+{% extends "base.html" %}
+
+{% block title %}Mis Pedidos - Wine Shop{% endblock %}
+
+{% block content %}
+<style>
+    .pedidos-grid {
+        display: grid;
+        gap: 1.5rem;
+        margin: 2rem 0;
+    }
+
+    .pedido-card {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        border-left: 4px solid #722f37;
+    }
+
+    .pedido-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .pedido-numero {
+        font-size: 1.2rem;
+        color: #722f37;
+        font-weight: 700;
+    }
+
+    .pedido-fecha {
+        color: #999;
+        font-size: 0.9rem;
+    }
+
+    .estado-badge {
+        display: inline-block;
+        padding: 0.35rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+    }
+
+    .estado-pendiente {
+        background: #fff3cd;
+        color: #856404;
+    }
+
+    .estado-confirmado {
+        background: #d1ecf1;
+        color: #0c5460;
+    }
+
+    .estado-enviado {
+        background: #cce5ff;
+        color: #004085;
+    }
+
+    .estado-entregado {
+        background: #d4edda;
+        color: #155724;
+    }
+
+    .estado-cancelado {
+        background: #f8d7da;
+        color: #721c24;
+    }
+
+    .pedido-info {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 1rem;
+        margin: 1rem 0;
+    }
+
+    .info-item {
+        background: #f9f9f9;
+        padding: 1rem;
+        border-radius: 5px;
+    }
+
+    .info-label {
+        color: #999;
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+
+    .info-valor {
+        color: #722f37;
+        font-size: 1.1rem;
+        font-weight: 700;
+    }
+
+    .pedido-items {
+        background: #f9f9f9;
+        padding: 1rem;
+        border-radius: 5px;
+        margin: 1rem 0;
+        max-height: 150px;
+        overflow-y: auto;
+    }
+
+    .item-mini {
+        display: flex;
+        justify-content: space-between;
+        padding: 0.5rem 0;
+        border-bottom: 1px solid #eee;
+        font-size: 0.9rem;
+    }
+
+    .item-mini:last-child {
+        border-bottom: none;
+    }
+
+    .item-cantidad {
+        color: #999;
+    }
+
+    .pedido-acciones {
+        display: flex;
+        gap: 1rem;
+        margin-top: 1rem;
+    }
+
+    .pedido-acciones a {
+        padding: 0.5rem 1rem;
+        border-radius: 5px;
+        text-decoration: none;
+        font-size: 0.9rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+    .btn-ver {
+        background: #722f37;
+        color: white;
+    }
+
+    .btn-ver:hover {
+        background: #8b4153;
+    }
+
+    .btn-descargar {
+        background: #d4a574;
+        color: white;
+    }
+
+    .btn-descargar:hover {
+        background: #c4955a;
+    }
+
+    .pedidos-vacio {
+        text-align: center;
+        padding: 3rem 2rem;
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+
+    .pedidos-vacio h3 {
+        color: #722f37;
+        margin-bottom: 1rem;
+    }
+
+    .pedidos-vacio p {
+        color: #999;
+        margin-bottom: 1.5rem;
+    }
+
+    @media (max-width: 768px) {
+        .pedido-header {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .pedido-info {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .pedido-acciones {
+            flex-direction: column;
+        }
+
+        .pedido-acciones a {
+            text-align: center;
+        }
+    }
+</style>
+
+<div class="container">
+    <h1 class="section-title">Mis Pedidos</h1>
+
+    {% if pedidos %}
+    <div class="pedidos-grid">
+        {% for pedido in pedidos %}
+        <div class="pedido-card">
+            <div class="pedido-header">
+                <div>
+                    <div class="pedido-numero">Pedido #{{ pedido.id }}</div>
+                    <div class="pedido-fecha">{{ pedido.fecha_pedido|date:"d de F de Y" }}</div>
+                </div>
+                <span class="estado-badge estado-{{ pedido.estado }}">{{ pedido.get_estado_display }}</span>
+            </div>
+
+            <div class="pedido-info">
+                <div class="info-item">
+                    <div class="info-label">Total</div>
+                    <div class="info-valor">${{ pedido.total }}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Método de Pago</div>
+                    <div class="info-valor" style="font-size: 1rem;">{{ pedido.get_metodo_pago_display }}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Productos</div>
+                    <div class="info-valor">{{ pedido.detalles.count }}</div>
+                </div>
+            </div>
+
+            <div class="pedido-items">
+                <div style="font-weight: 600; color: #722f37; margin-bottom: 0.5rem; font-size: 0.9rem;">Productos:</div>
+                {% for detalle in pedido.detalles.all %}
+                <div class="item-mini">
+                    <span>{{ detalle.producto.nombre }}</span>
+                    <span class="item-cantidad">x{{ detalle.cantidad }} - ${{ detalle.subtotal }}</span>
+                </div>
+                {% endfor %}
+            </div>
+
+            <div class="pedido-acciones">
+                <a href="{% url 'detalle_pedido' pedido.id %}" class="btn-ver">Ver Detalles</a>
+                <a href="#" class="btn-descargar" onclick="alert('Descargar factura en desarrollo'); return false;">Descargar Factura</a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="pedidos-vacio">
+        <h3>Aún no tienes pedidos</h3>
+        <p>Comienza tu experiencia de compra en Wine Shop</p>
+        <a href="{% url 'catalogo' %}" class="btn btn-primary">Ir al Catálogo</a>
+    </div>
+    {% endif %}
+
+    <div style="margin-top: 2rem; text-align: center;">
+        <a href="{% url 'perfil_usuario' %}" style="color: #722f37; text-decoration: none;">← Volver al Perfil</a>
+    </div>
+</div>
+{% endblock %}

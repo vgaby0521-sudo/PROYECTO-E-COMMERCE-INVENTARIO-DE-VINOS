@@ -1,0 +1,307 @@
+{% extends "base.html" %}
+
+{% block title %}Panel de Administración - Wine Shop{% endblock %}
+
+{% block content %}
+
+{% if not user.is_superuser %}
+<div class="alert-warning">
+    🚫 No tienes permisos para acceder a este panel.
+</div>
+{% else %}
+
+
+<style>
+    .admin-header {
+        background: linear-gradient(135deg, #722f37 0%, #8b4153 100%);
+        color: white;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        border-radius: 10px;
+    }
+
+    .admin-title {
+        font-size: 2.5rem;
+        margin: 0 0 1rem 0;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .admin-subtitle {
+        font-size: 1rem;
+        opacity: 0.9;
+    }
+
+    .admin-actions {
+        display: flex;
+        gap: 1rem;
+        margin-top: 1rem;
+        flex-wrap: wrap;
+    }
+
+    .logout-btn {
+        background: var(--accent);
+        color: var(--dark);
+    }
+
+    .logout-btn:hover {
+        background: #c4955a;
+    }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .stat-card {
+        background: white;
+        padding: 2rem;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        text-align: center;
+        border-left: 4px solid #722f37;
+        transition: all 0.3s ease;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+    }
+
+    .stat-card.inventario {
+        border-left-color: #d4a574;
+    }
+
+    .stat-card.usuarios {
+        border-left-color: #8b4153;
+    }
+
+    .stat-card.productos {
+        border-left-color: #27ae60;
+    }
+
+    .stat-card.pedidos {
+        border-left-color: #2471a3;
+    }
+
+    .stat-card.facturas {
+        border-left-color: #e74c3c;
+    }
+
+    .stat-card.clientes {
+        border-left-color: #f39c12;
+    }
+
+    .stat-card.proveedores {
+        border-left-color: #9b59b6;
+    }
+
+    .stat-number {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #722f37;
+        margin: 0.5rem 0;
+    }
+
+    .stat-label {
+        font-size: 0.95rem;
+        color: #666;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        font-weight: 600;
+    }
+
+    .action-icon {
+        font-size: 2rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .inventory-btn-container {
+        text-align: center;
+        margin-top: 2rem;
+    }
+
+    .inventory-btn {
+        background: linear-gradient(135deg, #722f37 0%, #8b4153 100%);
+        color: white;
+        padding: 1rem 2rem;
+        border-radius: 5px;
+        text-decoration: none;
+        font-weight: 600;
+        display: inline-block;
+        transition: all 0.3s ease;
+    }
+
+    .inventory-btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 5px 15px rgba(114, 47, 55, 0.3);
+    }
+
+    .alert-warning {
+        background: #fff3cd;
+        color: #856404;
+        border-left: 4px solid #ffc107;
+        padding: 1rem;
+        border-radius: 5px;
+        margin-bottom: 2rem;
+    }
+
+    @media (max-width: 768px) {
+        .admin-title {
+            font-size: 1.8rem;
+        }
+
+        .stats-grid {
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        }
+
+        .stat-number {
+            font-size: 2rem;
+        }
+
+        .admin-actions {
+            flex-direction: column;
+        }
+
+        .btn {
+            width: 100%;
+        }
+    }
+</style>
+
+<div class="container">
+    <div class="admin-header">
+        <h1 class="admin-title">🔧 Panel de Administración</h1>
+        <p class="admin-subtitle">Bienvenido, {{ user.first_name|default:user.username }}. Gestiona tu tienda desde aquí.</p>
+        <div class="admin-actions">
+            <a href="{% url 'home' %}" class="btn btn-primary">← Volver al Inicio</a>
+            <a href="{% url 'logout' %}" class="btn logout-btn">Cerrar Sesión</a>
+        </div>
+    </div>
+
+    <div class="alert-warning">
+        <strong>ℹ️ Información:</strong> Este panel muestra un resumen de tu tienda. Haz clic en el botón de Inventario para gestionar el stock.
+    </div>
+
+    <h2 class="section-title">Resumen General</h2>
+
+    <div class="stats-grid">
+        <div class="stat-card usuarios">
+            <div class="action-icon">👥</div>
+            <div class="stat-number">{{ usuarios }}</div>
+            <div class="stat-label">Usuarios</div>
+        </div>
+
+        <div class="stat-card productos">
+            <div class="action-icon">🍷</div>
+            <div class="stat-number">{{ productos }}</div>
+            <div class="stat-label">Productos</div>
+        </div>
+
+        <div class="stat-card pedidos">
+            <div class="action-icon">📦</div>
+            <div class="stat-number">{{ pedidos }}</div>
+            <div class="stat-label">Pedidos</div>
+        </div>
+
+        <div class="stat-card facturas">
+            <div class="action-icon">📄</div>
+            <div class="stat-number">{{ facturas }}</div>
+            <div class="stat-label">Facturas</div>
+        </div>
+
+        <div class="stat-card inventario">
+            <div class="action-icon">📊</div>
+            <div class="stat-number">{{ inventario }}</div>
+            <div class="stat-label">Inventario</div>
+        </div>
+
+        <div class="stat-card clientes">
+            <div class="action-icon">🎯</div>
+            <div class="stat-number">{{ clientes }}</div>
+            <div class="stat-label">Clientes</div>
+        </div>
+
+        <div class="stat-card proveedores">
+            <div class="action-icon">🚚</div>
+            <div class="stat-number">{{ proveedores }}</div>
+            <div class="stat-label">Proveedores</div>
+        </div>
+    </div>
+
+    <div class="inventory-btn-container">
+        <a href="{% url 'generar_reporte_excel' %}" class="inventory-btn">📊 Generar Reporte Excel</a>
+        <a href="{% url 'admin:index' %}" class="inventory-btn" style="margin-left: 10px;">📊 Ir al Inventario (Admin Django)</a>
+    </div>
+
+    <h2 class="section-title">Gestión de Datos</h2>
+
+    <style>
+        .crud-links {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .crud-link-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            text-decoration: none;
+            color: var(--primary);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            border-left: 4px solid var(--primary);
+            text-align: center;
+        }
+
+        .crud-link-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+        }
+
+        .crud-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .crud-label {
+            font-weight: 600;
+            color: var(--primary);
+        }
+    </style>
+
+    <div class="crud-links">
+        <a href="{% url 'productos_list' %}" class="crud-link-card">
+            <div class="crud-icon">🍷</div>
+            <div class="crud-label">Productos</div>
+        </a>
+        <a href="{% url 'proveedores_list' %}" class="crud-link-card">
+            <div class="crud-icon">🚚</div>
+            <div class="crud-label">Proveedores</div>
+        </a>
+        <a href="{% url 'pedidos_list' %}" class="crud-link-card">
+            <div class="crud-icon">📦</div>
+            <div class="crud-label">Pedidos</div>
+        </a>
+        <a href="{% url 'clientes_list' %}" class="crud-link-card">
+            <div class="crud-icon">👥</div>
+            <div class="crud-label">Clientes</div>
+        </a>
+        <a href="{% url 'usuarios_list' %}" class="crud-link-card">
+            <div class="crud-icon">👨‍💼</div>
+            <div class="crud-label">Usuarios</div>
+        </a>
+        <a href="{% url 'roles_list' %}" class="crud-link-card">
+            <div class="crud-icon">🔐</div>
+            <div class="crud-label">Roles</div>
+        </a>
+    </div>
+</div>
+{% endif %}
+
+{% endblock %}

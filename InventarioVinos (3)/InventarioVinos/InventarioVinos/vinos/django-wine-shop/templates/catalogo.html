@@ -1,0 +1,199 @@
+{% extends "base.html" %}
+
+{% block title %}Catálogo - Wine Shop{% endblock %}
+
+{% block content %}
+<style>
+    .catalogo-container {
+        display: grid;
+        grid-template-columns: 250px 1fr;
+        gap: 2rem;
+        margin: 2rem 0;
+    }
+
+    .filtros {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        height: fit-content;
+    }
+
+    .filtros h3 {
+        color: #722f37;
+        margin-bottom: 1rem;
+        font-size: 1.2rem;
+    }
+
+    .busqueda {
+        margin-bottom: 1.5rem;
+    }
+
+    .busqueda input {
+        width: 100%;
+    }
+
+    .categorias-list {
+        list-style: none;
+    }
+
+    .categorias-list label {
+        display: flex;
+        align-items: center;
+        margin-bottom: 0.5rem;
+        cursor: pointer;
+        font-weight: normal;
+    }
+
+    .categorias-list input[type="radio"] {
+        width: auto;
+        margin-right: 0.5rem;
+    }
+
+    .contenido-catalogo {
+        background: white;
+        padding: 2rem;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+
+    .resultado-busqueda {
+        color: #666;
+        margin-bottom: 1rem;
+        font-size: 0.95rem;
+    }
+
+    .ordenamiento {
+        margin-bottom: 1.5rem;
+    }
+
+    .ordenamiento select {
+        max-width: 300px;
+    }
+
+    @media (max-width: 1024px) {
+        .catalogo-container {
+            grid-template-columns: 1fr;
+        }
+
+        .filtros {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            height: auto;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .catalogo-container {
+            margin: 1rem 0;
+        }
+
+        .contenido-catalogo {
+            padding: 1rem;
+        }
+    }
+</style>
+
+<div class="container">
+    <h1 class="section-title">Catálogo de Vinos</h1>
+
+    <div class="catalogo-container">
+        <aside class="filtros">
+            <h3>Filtros</h3>
+            
+            <div class="busqueda">
+                <form method="get" style="margin: 0;">
+                    <label for="busqueda">Buscar Producto:</label>
+                    <input type="text" id="busqueda" name="busqueda" value="{{ busqueda }}" placeholder="Nombre, descripción...">
+                    {% if categoria_seleccionada %}
+                    <input type="hidden" name="categoria" value="{{ categoria_seleccionada }}">
+                    {% endif %}
+                    <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 0.5rem;">Buscar</button>
+                </form>
+            </div>
+
+            <h4 style="color: #722f37; margin-bottom: 1rem; margin-top: 1.5rem;">Categorías</h4>
+            <form method="get">
+                {% if busqueda %}
+                <input type="hidden" name="busqueda" value="{{ busqueda }}">
+                {% endif %}
+                <ul class="categorias-list">
+                    <li>
+                        <label>
+                            <input type="radio" name="categoria" value="" {% if not categoria_seleccionada %}checked{% endif %} onchange="this.form.submit()">
+                            Todas las Categorías
+                        </label>
+                    </li>
+                    {% for categoria in categorias %}
+                    <li>
+                        <label>
+                            <input type="radio" name="categoria" value="{{ categoria.id }}" onchange="this.form.submit()">
+                            {{ categoria.nombre }}
+                        </label>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </form>
+        </aside>
+
+        <section class="contenido-catalogo">
+            {% if busqueda or categoria_seleccionada %}
+            <div class="resultado-busqueda">
+                {% if busqueda %}
+                Resultados para: <strong>"{{ busqueda }}"</strong>
+                {% endif %}
+                {% if categoria_seleccionada %}
+                en la categoría: <strong>{{ categoria_seleccionada }}</strong>
+                {% endif %}
+            </div>
+            {% endif %}
+
+            {% if productos %}
+            <div class="grid">
+                {% for producto in productos %}
+                <div class="producto-card">
+                    <img src="{{ producto.imagen_url }}" alt="{{ producto.nombre }}" class="producto-image">
+                    <div class="producto-info">
+                        {% if producto.precio_oferta %}
+                        <span class="descuento-badge">OFERTA</span>
+                        {% endif %}
+                        <h3 class="producto-nombre">{{ producto.nombre }}</h3>
+                        <p class="producto-descripcion">{{ producto.descripcion|truncatewords:8 }}</p>
+                        
+                        {% if producto.pais %}
+                        <small style="color: #999; display: block; margin-bottom: 0.5rem;">Pais: {{ producto.pais }}</small>
+                        {% endif %}
+                        
+                        <div class="producto-precio">
+                            {% if producto.precio_oferta %}
+                            <span class="precio-original">${{ producto.precio }}</span>
+                            {% endif %}
+                            ${{ producto.precio_final }}
+                        </div>
+                        
+                        {% if producto.stock > 0 %}
+                        <div style="margin-bottom: 1rem; font-size: 0.85rem; color: #27ae60;">
+                            En stock ({{ producto.stock }} disponibles)
+                        </div>
+                        {% else %}
+                        <div style="margin-bottom: 1rem; font-size: 0.85rem; color: #e74c3c;">
+                            Agotado
+                        </div>
+                        {% endif %}
+                        
+                        <a href="{% url 'detalle_producto' producto.id %}" class="btn btn-primary producto-button">Ver Detalles</a>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div style="text-align: center; padding: 2rem; background: #f9f9f9; border-radius: 10px;">
+                <h3 style="color: #722f37; margin-bottom: 1rem;">No se encontraron productos</h3>
+                <p style="color: #999; margin-bottom: 1.5rem;">Intenta ajustar tus filtros o búsqueda</p>
+                <a href="{% url 'catalogo' %}" class="btn btn-primary">Ver Todos los Productos</a>
+            </div>
+            {% endif %}
+        </section>
+    </div>
+</div>
+{% endblock %}

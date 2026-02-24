@@ -1,0 +1,68 @@
+{% extends "crud/base_crud.html" %}
+
+{% block crud_title %}Gestión de Usuarios{% endblock %}
+
+{% block crud_content %}
+<div class="crud-header">
+    <h1 class="crud-title">👨‍💼 Usuarios Admin</h1>
+    <div class="crud-actions">
+        <a href="{% url 'usuario_create' %}" class="btn btn-primary">+ Nuevo Usuario</a>
+        <a href="{% url 'admin_panel' %}" class="btn btn-secondary">← Panel Admin</a>
+    </div>
+</div>
+
+{% if usuarios %}
+<div class="table-container">
+    <table>
+        <thead>
+            <tr>
+                <th>Usuario</th>
+                <th>Nombre</th>
+                <th>Correo</th>
+                <th>Tipo</th>
+                <th>Activo</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for usuario in usuarios %}
+            <tr>
+                <td><strong>{{ usuario.username }}</strong></td>
+                <td>{{ usuario.first_name }} {{ usuario.last_name }}</td>
+                <td>{{ usuario.email }}</td>
+                <td>
+                    <span style="background: #722f37; color: white; padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.85rem;">
+                        Admin
+                    </span>
+                </td>
+                <td>
+                    {% if usuario.is_active %}
+                    <span style="color: #27ae60; font-weight: 600;">✓ Sí</span>
+                    {% else %}
+                    <span style="color: #e74c3c; font-weight: 600;">✗ No</span>
+                    {% endif %}
+                </td>
+                <td>
+                    <div class="action-buttons">
+                        <a href="{% url 'usuario_edit' usuario.id %}" class="btn-small btn-edit">Editar</a>
+                        {% if usuario.id != request.user.id %}
+                        <a href="{% url 'usuario_delete' usuario.id %}" class="btn-small btn-delete">Eliminar</a>
+                        {% endif %}
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<div class="table-container">
+    <div class="empty-state">
+        <div class="empty-state-icon">📭</div>
+        <p>No hay usuarios administrador registrados</p>
+        <a href="{% url 'usuario_create' %}" class="btn btn-primary" style="margin-top: 1rem;">+ Crear Primer Usuario</a>
+    </div>
+</div>
+{% endif %}
+
+{% endblock %}

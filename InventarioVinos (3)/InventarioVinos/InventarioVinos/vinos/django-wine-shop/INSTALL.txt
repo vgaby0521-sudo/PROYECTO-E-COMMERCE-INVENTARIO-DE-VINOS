@@ -1,0 +1,43 @@
+================================================
+WINE SHOP - INSTALACIÓN EN WINDOWS
+================================================
+
+PASO 1: Abre PowerShell o CMD en esta carpeta
+
+PASO 2: Ejecuta estos comandos en orden:
+
+    python -m venv venv
+    venv\Scripts\activate
+    pip install Django==4.2.7 python-decouple==3.8
+    python manage.py migrate
+    python seed.py
+
+PASO 3: Inicia el servidor:
+
+    python manage.py runserver
+
+PASO 4: Abre en tu navegador:
+
+    http://127.0.0.1:8000
+
+================================================
+
+USUARIOS DE PRUEBA:
+- Admin: admin / Admin12345!
+- Cliente: cliente1 / Cliente123!
+
+PANEL ADMIN:
+    http://127.0.0.1:8000/admin/
+
+================================================
+
+¿PROBLEMAS?
+
+Si ves "port already in use":
+    python manage.py runserver 8001
+
+Si ves errores de dependencias:
+    pip install --upgrade pip
+    pip install Django==4.2.7 python-decouple==3.8
+
+================================================

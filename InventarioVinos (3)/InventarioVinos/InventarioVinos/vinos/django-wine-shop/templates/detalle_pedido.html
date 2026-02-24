@@ -1,0 +1,485 @@
+{% extends "base.html" %}
+
+{% block title %}Detalle del Pedido - Wine Shop{% endblock %}
+
+{% block content %}
+<style>
+    .detalle-container {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 2rem;
+        margin: 2rem 0;
+    }
+
+    .detalle-main {
+        background: white;
+        padding: 2rem;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+
+    .pedido-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+        padding-bottom: 2rem;
+        border-bottom: 2px solid #d4a574;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .pedido-titulo {
+        font-size: 1.8rem;
+        color: #722f37;
+        font-weight: 700;
+    }
+
+    .estado-badge {
+        display: inline-block;
+        padding: 0.5rem 1rem;
+        border-radius: 25px;
+        font-size: 0.9rem;
+        font-weight: 600;
+    }
+
+    .estado-pendiente {
+        background: #fff3cd;
+        color: #856404;
+    }
+
+    .estado-confirmado {
+        background: #d1ecf1;
+        color: #0c5460;
+    }
+
+    .estado-enviado {
+        background: #cce5ff;
+        color: #004085;
+    }
+
+    .estado-entregado {
+        background: #d4edda;
+        color: #155724;
+    }
+
+    .seccion {
+        margin-bottom: 2rem;
+    }
+
+    .seccion-titulo {
+        font-size: 1.2rem;
+        color: #722f37;
+        font-weight: 700;
+        margin-bottom: 1rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 1px solid #eee;
+    }
+
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .info-card {
+        background: #f9f9f9;
+        padding: 1rem;
+        border-radius: 5px;
+    }
+
+    .info-label {
+        color: #999;
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+
+    .info-valor {
+        color: #722f37;
+        font-size: 1rem;
+        font-weight: 600;
+    }
+
+    .productos-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 1rem 0;
+    }
+
+    .productos-table thead {
+        background: #f9f9f9;
+    }
+
+    .productos-table th, .productos-table td {
+        padding: 1rem;
+        text-align: left;
+        border-bottom: 1px solid #eee;
+    }
+
+    .productos-table th {
+        color: #722f37;
+        font-weight: 600;
+    }
+
+    .producto-col {
+        display: flex;
+        gap: 1rem;
+        align-items: center;
+    }
+
+    .producto-img {
+        width: 60px;
+        height: 60px;
+        object-fit: cover;
+        border-radius: 5px;
+    }
+
+    .resumen-panel {
+        background: white;
+        padding: 2rem;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        height: fit-content;
+        position: sticky;
+        top: 100px;
+    }
+
+    .resumen-panel h3 {
+        color: #722f37;
+        margin-bottom: 1.5rem;
+        font-size: 1.2rem;
+    }
+
+    .resumen-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 0.75rem 0;
+        border-bottom: 1px solid #eee;
+    }
+
+    .resumen-total {
+        display: flex;
+        justify-content: space-between;
+        padding: 1rem 0;
+        border-top: 2px solid #722f37;
+        margin-top: 1rem;
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: #722f37;
+    }
+
+    .factura-box {
+        background: linear-gradient(135deg, #722f37 0%, #8b4153 100%);
+        color: white;
+        padding: 1.5rem;
+        border-radius: 10px;
+        margin-top: 1.5rem;
+    }
+
+    .factura-box h4 {
+        margin-bottom: 1rem;
+    }
+
+    .factura-numero {
+        font-size: 1.2rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+
+    .factura-info {
+        font-size: 0.9rem;
+        opacity: 0.9;
+    }
+
+    .botones {
+        display: flex;
+        gap: 1rem;
+        margin-top: 2rem;
+    }
+
+    .botones a {
+        flex: 1;
+        padding: 0.75rem 1rem;
+        border: none;
+        border-radius: 5px;
+        text-decoration: none;
+        text-align: center;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+    .btn-volver {
+        background: #ddd;
+        color: #666;
+    }
+
+    .btn-volver:hover {
+        background: #ccc;
+    }
+
+    .btn-descargar {
+        background: #722f37;
+        color: white;
+    }
+
+    .btn-descargar:hover {
+        background: #8b4153;
+    }
+
+    .linea-tiempo {
+        margin: 2rem 0;
+    }
+
+    .evento {
+        display: flex;
+        gap: 2rem;
+        margin-bottom: 1.5rem;
+        padding-bottom: 1.5rem;
+        border-bottom: 1px solid #eee;
+    }
+
+    .evento:last-child {
+        border-bottom: none;
+    }
+
+    .evento-icono {
+        flex-shrink: 0;
+        width: 40px;
+        height: 40px;
+        background: #d4a574;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: 700;
+    }
+
+    .evento-contenido {
+        flex-grow: 1;
+    }
+
+    .evento-titulo {
+        color: #722f37;
+        font-weight: 600;
+        margin-bottom: 0.3rem;
+    }
+
+    .evento-fecha {
+        color: #999;
+        font-size: 0.9rem;
+    }
+
+    @media (max-width: 1024px) {
+        .detalle-container {
+            grid-template-columns: 1fr;
+        }
+
+        .resumen-panel {
+            position: relative;
+            top: 0;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .pedido-header {
+            flex-direction: column;
+        }
+
+        .info-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .producto-col {
+            flex-direction: column;
+            text-align: center;
+        }
+
+        .botones {
+            flex-direction: column;
+        }
+    }
+</style>
+
+<div class="container">
+    <div style="margin-bottom: 2rem;">
+        <a href="{% url 'mis_pedidos' %}" style="color: #722f37; text-decoration: none;">← Volver a Mis Pedidos</a>
+    </div>
+
+    <div class="detalle-container">
+        <div class="detalle-main">
+            <div class="pedido-header">
+                <div>
+                    <div class="pedido-titulo">Pedido #{{ pedido.id }}</div>
+                </div>
+                <span class="estado-badge estado-{{ pedido.estado }}">{{ pedido.get_estado_display }}</span>
+            </div>
+
+            <div class="seccion">
+                <h3 class="seccion-titulo">Información del Pedido</h3>
+                <div class="info-grid">
+                    <div class="info-card">
+                        <div class="info-label">Fecha de Pedido</div>
+                        <div class="info-valor">{{ pedido.fecha_pedido|date:"d/m/Y H:i" }}</div>
+                    </div>
+                    <div class="info-card">
+                        <div class="info-label">Método de Pago</div>
+                        <div class="info-valor">{{ pedido.get_metodo_pago_display }}</div>
+                    </div>
+                    <div class="info-card">
+                        <div class="info-label">Estado</div>
+                        <div class="info-valor">{{ pedido.get_estado_display }}</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="seccion">
+                <h3 class="seccion-titulo">Dirección de Envío</h3>
+                <div class="info-grid">
+                    <div class="info-card" style="grid-column: 1/-1;">
+                        <div class="info-label">Dirección Completa</div>
+                        <div class="info-valor">
+                            {{ pedido.direccion_envio }}<br>
+                            {{ pedido.ciudad_envio }}<br>
+                            Teléfono: {{ pedido.telefono_envio }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="seccion">
+                <h3 class="seccion-titulo">Productos Pedidos</h3>
+                <table class="productos-table">
+                    <thead>
+                        <tr>
+                            <th>Producto</th>
+                            <th>Precio</th>
+                            <th>Cantidad</th>
+                            <th>Subtotal</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for detalle in detalles %}
+                        <tr>
+                            <td>
+                                <div class="producto-col">
+                                    {% if detalle.producto.imagen_url %}
+                                    <img src="{{ detalle.producto.imagen_url }}" alt="{{ detalle.producto.nombre }}" class="producto-img">
+                                    {% endif %}
+                                    <div>{{ detalle.producto.nombre }}</div>
+                                </div>
+                            </td>
+                            <td>${{ detalle.precio_unitario }}</td>
+                            <td>{{ detalle.cantidad }}</td>
+                            <td>${{ detalle.subtotal }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            {% if pedido.observaciones %}
+            <div class="seccion">
+                <h3 class="seccion-titulo">Observaciones</h3>
+                <div style="background: #f9f9f9; padding: 1rem; border-radius: 5px; color: #666;">
+                    {{ pedido.observaciones }}
+                </div>
+            </div>
+            {% endif %}
+
+            <div class="seccion">
+                <h3 class="seccion-titulo">Estado del Envío</h3>
+                <div class="linea-tiempo">
+                    <div class="evento">
+                        <div class="evento-icono">✓</div>
+                        <div class="evento-contenido">
+                            <div class="evento-titulo">Pedido Creado</div>
+                            <div class="evento-fecha">{{ pedido.fecha_pedido|date:"d/m/Y H:i" }}</div>
+                        </div>
+                    </div>
+
+                    {% if pedido.estado != 'pendiente' %}
+                    <div class="evento">
+                        <div class="evento-icono">✓</div>
+                        <div class="evento-contenido">
+                            <div class="evento-titulo">Pedido Confirmado</div>
+                            <div class="evento-fecha">Se confirmó tu pedido</div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if pedido.estado in 'enviado entregado' %}
+                    <div class="evento">
+                        <div class="evento-icono">🚚</div>
+                        <div class="evento-contenido">
+                            <div class="evento-titulo">En Tránsito</div>
+                            <div class="evento-fecha">Tu pedido está en camino</div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if pedido.estado == 'entregado' %}
+                    <div class="evento">
+                        <div class="evento-icono">✓</div>
+                        <div class="evento-contenido">
+                            <div class="evento-titulo">Entregado</div>
+                            <div class="evento-fecha">Tu pedido fue entregado exitosamente</div>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="resumen-panel">
+            <h3>Resumen del Pedido</h3>
+
+            {% for detalle in detalles %}
+            <div class="resumen-item">
+                <span>{{ detalle.producto.nombre }} x{{ detalle.cantidad }}</span>
+                <span>${{ detalle.subtotal }}</span>
+            </div>
+            {% endfor %}
+
+            <div class="resumen-item" style="margin-top: 1rem; padding-top: 1rem;">
+                <span>Subtotal:</span>
+                <span>${{ pedido.total }}</span>
+            </div>
+
+            <div class="resumen-item">
+                <span>Envío:</span>
+                <span>Gratis</span>
+            </div>
+
+            <div class="resumen-item">
+                <span>Impuesto (19%):</span>
+                <span>${{ pedido.total|add:"0"|mul:"0.19" }}</span>
+            </div>
+
+            <div class="resumen-total">
+                <span>Total:</span>
+                <span>${{ pedido.total|add:pedido.total|mul:"0.19" }}</span>
+            </div>
+
+            {% if pedido.factura %}
+            <div class="factura-box">
+                <h4>Factura</h4>
+                <div class="factura-numero">{{ pedido.factura.numero_factura }}</div>
+                <div class="factura-info">
+                    Emitida: {{ pedido.factura.fecha_emision|date:"d/m/Y" }}<br>
+                    Estado: {{ pedido.factura.get_estado_pago_display }}
+                </div>
+            </div>
+            {% endif %}
+
+            <div class="botones">
+                <a href="{% url 'mis_pedidos' %}" class="btn-volver">← Mis Pedidos</a>
+                <a href="#" class="btn-descargar" onclick="alert('Descarga disponible próximamente'); return false;">📥 Descargar Factura</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

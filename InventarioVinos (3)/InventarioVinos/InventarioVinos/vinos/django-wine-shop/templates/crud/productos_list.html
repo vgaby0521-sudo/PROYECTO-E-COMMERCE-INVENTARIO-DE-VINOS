@@ -1,0 +1,72 @@
+{% extends "crud/base_crud.html" %}
+
+{% block crud_title %}Gestión de Productos{% endblock %}
+
+{% block crud_content %}
+<div class="crud-header">
+    <h1 class="crud-title">🍷 Productos</h1>
+    <div class="crud-actions">
+        <a href="{% url 'producto_create' %}" class="btn btn-primary">+ Nuevo Producto</a>
+        <a href="{% url 'admin_panel' %}" class="btn btn-secondary">← Panel Admin</a>
+    </div>
+</div>
+
+{% if productos %}
+<div class="table-container">
+    <table>
+        <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>Categoría</th>
+                <th>Precio</th>
+                <th>Stock</th>
+                <th>Proveedor</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for producto in productos %}
+            <tr>
+                <td><strong>{{ producto.nombre }}</strong></td>
+                <td>{{ producto.categoria.nombre }}</td>
+                <td>${{ producto.precio }}</td>
+                <td>
+                    {% if producto.stock > 10 %}
+                    <span style="color: #27ae60;">{{ producto.stock }}</span>
+                    {% elif producto.stock > 0 %}
+                    <span style="color: #f39c12;">{{ producto.stock }}</span>
+                    {% else %}
+                    <span style="color: #e74c3c;">{{ producto.stock }}</span>
+                    {% endif %}
+                </td>
+                <td>{{ producto.proveedor.nombre|default:"—" }}</td>
+                <td>
+                    {% if producto.activo %}
+                    <span style="color: #27ae60;">✓ Activo</span>
+                    {% else %}
+                    <span style="color: #e74c3c;">✗ Inactivo</span>
+                    {% endif %}
+                </td>
+                <td>
+                    <div class="action-buttons">
+                        <a href="{% url 'producto_edit' producto.id %}" class="btn-small btn-edit">Editar</a>
+                        <a href="{% url 'producto_delete' producto.id %}" class="btn-small btn-delete">Eliminar</a>
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<div class="table-container">
+    <div class="empty-state">
+        <div class="empty-state-icon">📭</div>
+        <p>No hay productos registrados</p>
+        <a href="{% url 'producto_create' %}" class="btn btn-primary" style="margin-top: 1rem;">+ Crear Primer Producto</a>
+    </div>
+</div>
+{% endif %}
+
+{% endblock %}

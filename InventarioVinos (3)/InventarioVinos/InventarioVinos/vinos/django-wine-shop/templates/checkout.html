@@ -1,0 +1,345 @@
+{% extends "base.html" %}
+
+{% block title %}Checkout - Wine Shop{% endblock %}
+
+{% block content %}
+
+{% load custom_filters %}
+
+<style>
+    .checkout-container {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 2rem;
+        margin: 2rem 0;
+    }
+
+    .pasos {
+        background: white;
+        padding: 2rem;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+
+    .paso {
+        margin-bottom: 2rem;
+        padding-bottom: 2rem;
+        border-bottom: 1px solid #eee;
+    }
+
+    .paso:last-child {
+        border-bottom: none;
+    }
+
+    .paso-titulo {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+        color: #722f37;
+        font-size: 1.2rem;
+        font-weight: 700;
+    }
+
+    .paso-numero {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 35px;
+        height: 35px;
+        background: #722f37;
+        color: white;
+        border-radius: 50%;
+        font-weight: 700;
+    }
+
+    .form-paso {
+        display: grid;
+        gap: 1rem;
+    }
+
+    .form-grupo {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+    }
+
+    .form-grupo.completo {
+        grid-template-columns: 1fr;
+    }
+
+    .resumen-compra {
+        background: white;
+        padding: 2rem;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        height: fit-content;
+        position: sticky;
+        top: 100px;
+    }
+
+    .resumen-compra h3 {
+        color: #722f37;
+        margin-bottom: 1.5rem;
+        font-size: 1.3rem;
+    }
+
+    .producto-resumen {
+        display: flex;
+        justify-content: space-between;
+        padding: 0.75rem 0;
+        border-bottom: 1px solid #eee;
+        font-size: 0.95rem;
+    }
+
+    .cantidad-producto {
+        color: #999;
+    }
+
+    .resumen-total {
+        display: flex;
+        justify-content: space-between;
+        padding: 1rem 0;
+        border-top: 2px solid #722f37;
+        margin-top: 1rem;
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: #722f37;
+    }
+
+    .resumen-compra .btn {
+        width: 100%;
+        margin-top: 1.5rem;
+    }
+
+    .terminos {
+        margin: 1.5rem 0;
+        font-size: 0.9rem;
+    }
+
+    .terminos label {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+
+    .terminos input[type="checkbox"] {
+        width: auto;
+        margin-top: 0.25rem;
+    }
+
+    .exito {
+        text-align: center;
+        padding: 2rem;
+    }
+
+    .exito-icono {
+        font-size: 4rem;
+        margin-bottom: 1rem;
+    }
+
+    .exito-titulo {
+        font-size: 2rem;
+        color: #722f37;
+        margin-bottom: 1rem;
+    }
+
+    .exito-mensaje {
+        color: #666;
+        margin-bottom: 2rem;
+    }
+
+    @media (max-width: 1024px) {
+        .checkout-container {
+            grid-template-columns: 1fr;
+        }
+
+        .resumen-compra {
+            position: relative;
+            top: 0;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .form-grupo {
+            grid-template-columns: 1fr;
+        }
+
+        .checkout-container {
+            margin: 1rem 0;
+        }
+
+        .pasos {
+            padding: 1rem;
+        }
+    }
+</style>
+
+<div class="container">
+    <h1 class="section-title">Checkout</h1>
+
+    <div class="checkout-container">
+        <form id="formCheckout" class="pasos">
+            {% csrf_token %}
+
+            <div class="paso">
+                <div class="paso-titulo">
+                    <span class="paso-numero">1</span>
+                    Dirección de Envío
+                </div>
+                <div class="form-paso">
+                    <div class="form-grupo">
+                        <div class="form-group">
+                            <label for="nombre">Nombre Completo:</label>
+                            <input type="text" id="nombre" name="nombre" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="telefono">Teléfono:</label>
+                            <input type="tel" id="telefono" name="telefono" required>
+                        </div>
+                    </div>
+                    <div class="form-grupo completo">
+                        <div class="form-group">
+                            <label for="direccion">Dirección:</label>
+                            <input type="text" id="direccion" name="direccion" required>
+                        </div>
+                    </div>
+                    <div class="form-grupo">
+                        <div class="form-group">
+                            <label for="ciudad">Ciudad:</label>
+                            <input type="text" id="ciudad" name="ciudad" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="codigo_postal">Código Postal:</label>
+                            <input type="text" id="codigo_postal" name="codigo_postal">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="paso">
+                <div class="paso-titulo">
+                    <span class="paso-numero">2</span>
+                    Método de Pago
+                </div>
+                <div class="form-paso">
+                    <div class="form-group completo">
+                        <label>Selecciona un método de pago:</label>
+                        <div style="display: flex; gap: 1rem; margin-top: 1rem;">
+                            <label style="display: flex; align-items: center; cursor: pointer; font-weight: normal;">
+                                <input type="radio" name="metodo_pago" value="tarjeta" checked>
+                                💳 Tarjeta de Crédito/Débito
+                            </label>
+                        </div>
+                        <div style="display: flex; gap: 1rem; margin-top: 0.5rem;">
+                            <label style="display: flex; align-items: center; cursor: pointer; font-weight: normal;">
+                                <input type="radio" name="metodo_pago" value="transferencia">
+                                🏦 Transferencia Bancaria
+                            </label>
+                        </div>
+                    </div>
+
+                    <div id="tarjetaInfo" class="form-group completo" style="margin-top: 1rem;">
+                        <div style="background: #f9f9f9; padding: 1rem; border-radius: 5px; color: #666; font-size: 0.9rem;">
+                            Por favor ingresa los datos de tu tarjeta. Se procesará de forma segura.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="paso">
+                <div class="paso-titulo">
+                    <span class="paso-numero">3</span>
+                    Confirmación
+                </div>
+                <div class="form-paso">
+                    <div class="form-group completo">
+                        <label for="observaciones">Observaciones (Opcional):</label>
+                        <textarea id="observaciones" name="observaciones" rows="3" style="resize: vertical;"></textarea>
+                    </div>
+
+                    <div class="terminos">
+                        <label>
+                            <input type="checkbox" name="terminos" required>
+                            Acepto los términos y condiciones y la política de privacidad
+                        </label>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary" style="width: 100%; padding: 1rem; font-size: 1.1rem; margin-top: 1rem;">
+                        Confirmar Pedido
+                    </button>
+                </div>
+            </div>
+        </form>
+
+        <div class="resumen-compra">
+            <h3>Resumen del Pedido</h3>
+            {% for item in items %}
+            <div class="producto-resumen">
+                <span>{{ item.producto.nombre }} <span class="cantidad-producto">x{{ item.cantidad }}</span></span>
+                <span>${{ item.subtotal }}</span>
+            </div>
+            {% endfor %}
+
+            <div style="border-top: 1px solid #eee; margin-top: 1rem; padding-top: 1rem;">
+                <div class="producto-resumen">
+                    <span>Subtotal:</span>
+                    <span>${{ total }}</span>
+                </div>
+                <div class="producto-resumen">
+                    <span>Envío:</span>
+                    <span>Gratis</span>
+                </div>
+                <div class="producto-resumen">
+                    <span>Impuesto (19%):</span>
+                    <span id="impuesto">${{ total|add:"0"|mul:"0.19" }}</span>
+                </div>
+            </div>
+
+            <div class="resumen-total">
+                <span>Total:</span>
+                <span id="totalFinal">${{ total|add:total|mul:"0.19" }}</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.getElementById('formCheckout').addEventListener('submit', async function(e) {
+        e.preventDefault();
+
+        const formData = new FormData(this);
+        const data = {
+            nombre: formData.get('nombre'),
+            direccion: formData.get('direccion'),
+            ciudad: formData.get('ciudad'),
+            telefono: formData.get('telefono'),
+            metodo_pago: formData.get('metodo_pago'),
+            observaciones: formData.get('observaciones'),
+        };
+
+        try {
+            const response = await fetch('{% url "crear_pedido" %}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                },
+                body: JSON.stringify(data)
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+                alert('¡Pedido creado exitosamente! Número: #' + result.pedido_id);
+                window.location.href = '{% url "detalle_pedido" 0 %}'.replace('0', result.pedido_id);
+            } else {
+                alert('Error: ' + result.message);
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Error al procesar el pedido');
+        }
+    });
+</script>
+{% endblock %}

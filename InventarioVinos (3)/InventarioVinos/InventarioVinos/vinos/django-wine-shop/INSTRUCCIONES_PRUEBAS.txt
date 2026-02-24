@@ -1,0 +1,149 @@
+================================================================================
+INSTRUCCIONES PARA EJECUTAR PRUEBAS FUNCIONALES - WINE SHOP
+================================================================================
+
+¡TODO ESTÁ LISTO! Ya instalé todas las dependencias necesarias.
+
+================================================================================
+PASO 1: INICIAR EL SERVIDOR DJANGO
+================================================================================
+
+1. Abre una terminal en:
+   C:\Users\valen\Downloads\InventarioVinos\InventarioVinos\vinos\django-wine-shop
+
+2. Activa el entorno virtual:
+   .\env\Scripts\Activate.ps1
+
+3. Inicia el servidor:
+   python manage.py runserver
+
+4. Verifica que el servidor esté corriendo en:
+   http://127.0.0.1:8000/
+
+   ¡NO CIERRES ESTA TERMINAL! Deja el servidor corriendo.
+
+================================================================================
+PASO 2: EJECUTAR LAS PRUEBAS FUNCIONALES
+================================================================================
+
+1. Abre UNA NUEVA TERMINAL (PowerShell) en la misma carpeta:
+   C:\Users\valen\Downloads\InventarioVinos\InventarioVinos\vinos\django-wine-shop
+
+2. Activa el entorno virtual:
+   .\env\Scripts\Activate.ps1
+
+3. Ejecuta las pruebas:
+   python Pruebas_Funcionales.py
+
+4. ¡DISFRUTA! Las pruebas se ejecutarán automáticamente:
+   - Se abrirá una ventana de Chrome
+   - Verás cómo se navega por el sitio automáticamente
+   - Se tomarán capturas de cada paso
+
+5. Las pruebas tardarán aproximadamente 5-10 minutos en completarse.
+
+================================================================================
+RESULTADOS
+================================================================================
+
+Las capturas se guardarán en:
+C:\Users\valen\Downloads\InventarioVinos\InventarioVinos\vinos\django-wine-shop\Capturas_Completas\
+
+Verás más de 30 capturas numeradas secuencialmente que documentan:
+- 001_home_inicial.png
+- 002_catalogo_publico.png
+- 003_catalogo_busqueda.png
+- ... y muchas más!
+
+================================================================================
+QUÉ SE PROBARÁ
+================================================================================
+
+✓ TEST 1: Navegación Pública (sin login)
+  - Página principal
+  - Catálogo
+  - Búsqueda de productos
+  - Detalle de producto
+  - Ofertas
+
+✓ TEST 2: Registro de Usuario
+  - Formulario de registro
+
+✓ TEST 3: Funcionalidades de CLIENTE
+  - Login
+  - Perfil de usuario
+  - Catálogo con sesión activa
+  - Agregar productos al carrito
+  - Ver carrito
+  - Proceso de checkout
+  - Historial de pedidos
+  - Logout
+
+✓ TEST 4: Funcionalidades de ADMINISTRADOR
+  - Login de admin
+  - Panel de administración
+  - CRUD de Productos (listar, crear, editar)
+  - CRUD de Proveedores (listar, crear)
+  - CRUD de Pedidos (listar, editar)
+  - CRUD de Clientes (listar, crear)
+  - CRUD de Usuarios (listar)
+  - Generación de reporte Excel
+  - Roles del sistema
+  - Perfil de administrador
+  - Logout
+
+✓ TEST 5: Verificación Final
+  - Elementos críticos del sistema
+
+================================================================================
+USUARIOS DE PRUEBA
+================================================================================
+
+CLIENTE:
+  Usuario: cliente1
+  Contraseña: Cliente123!
+
+ADMINISTRADOR:
+  Usuario: admin
+  Contraseña: Admin12345!
+
+================================================================================
+NOTAS IMPORTANTES
+================================================================================
+
+1. NO cierres la ventana del navegador durante las pruebas
+2. NO interactúes con el navegador mientras se ejecutan las pruebas
+3. Mantén el servidor Django corriendo en todo momento
+4. Si algo falla, verifica que el servidor esté corriendo
+5. Asegúrate de tener Google Chrome instalado y actualizado
+
+================================================================================
+SOLUCIÓN DE PROBLEMAS
+================================================================================
+
+Error: "Connection refused"
+→ El servidor Django no está corriendo. Ejecuta: python manage.py runserver
+
+Error: "ChromeDriver no encontrado"
+→ Verifica tu conexión a Internet. El script descarga ChromeDriver automáticamente.
+
+Error: "Login falló"
+→ Ejecuta: python seed.py para crear los usuarios de prueba
+
+================================================================================
+¡LISTO PARA EJECUTAR!
+================================================================================
+
+Recuerda:
+1. Terminal 1: python manage.py runserver (MANTENER ABIERTA)
+2. Terminal 2: python Pruebas_Funcionales.py (EJECUTAR PRUEBAS)
+
+¡Disfruta viendo las pruebas automáticas en acción! 🚀
+
+
+
+
+
+
+
+

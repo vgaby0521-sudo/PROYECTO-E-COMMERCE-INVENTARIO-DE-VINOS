@@ -1,0 +1,310 @@
+{% extends "base.html" %}
+{% load custom_filters %}
+
+{% block title %}Inventario - Wine Shop{% endblock %}
+
+{% block content %}
+<style>
+    .inventario-header {
+        background: linear-gradient(135deg, #722f37 0%, #8b4153 100%);
+        color: white;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        border-radius: 10px;
+    }
+
+    .inventario-title {
+        font-size: 2.5rem;
+        margin: 0 0 1rem 0;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .inventario-subtitle {
+        font-size: 1rem;
+        opacity: 0.9;
+    }
+
+    .inventario-actions {
+        display: flex;
+        gap: 1rem;
+        margin-top: 1rem;
+        flex-wrap: wrap;
+    }
+
+    .filters-section {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 10px;
+        margin-bottom: 2rem;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+
+    .filters-group {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+    }
+
+    .filter-input {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .filter-input label {
+        font-weight: 600;
+        color: #722f37;
+    }
+
+    .filter-input input,
+    .filter-input select {
+        padding: 0.75rem;
+        border: 2px solid #ddd;
+        border-radius: 5px;
+        font-family: 'Playfair Display', serif;
+    }
+
+    .filter-input input:focus,
+    .filter-input select:focus {
+        outline: none;
+        border-color: #722f37;
+        box-shadow: 0 0 0 3px rgba(114, 47, 55, 0.1);
+    }
+
+    .inventario-table {
+        background: white;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    thead {
+        background: linear-gradient(135deg, #722f37 0%, #8b4153 100%);
+        color: white;
+    }
+
+    th {
+        padding: 1.5rem;
+        text-align: left;
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.85rem;
+        letter-spacing: 1px;
+    }
+
+    td {
+        padding: 1rem 1.5rem;
+        border-bottom: 1px solid #eee;
+    }
+
+    tbody tr:hover {
+        background: #f9f9f9;
+    }
+
+    tbody tr:last-child td {
+        border-bottom: none;
+    }
+
+    .movimiento-entrada {
+        color: #27ae60;
+        font-weight: 600;
+    }
+
+    .movimiento-salida {
+        color: #e74c3c;
+        font-weight: 600;
+    }
+
+    .movimiento-ajuste {
+        color: #f39c12;
+        font-weight: 600;
+    }
+
+    .stock-positivo {
+        color: #27ae60;
+    }
+
+    .stock-negativo {
+        color: #e74c3c;
+    }
+
+    .fecha-badge {
+        background: #f0f0f0;
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.85rem;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 3rem 1rem;
+        color: #999;
+    }
+
+    .empty-state-icon {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+    }
+
+    .empty-state-text {
+        font-size: 1.2rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .empty-state-subtext {
+        font-size: 0.9rem;
+    }
+
+    @media (max-width: 768px) {
+        .inventario-title {
+            font-size: 1.8rem;
+        }
+
+        table {
+            font-size: 0.9rem;
+        }
+
+        th, td {
+            padding: 0.75rem;
+        }
+
+        .filters-group {
+            grid-template-columns: 1fr;
+        }
+
+        .inventario-actions {
+            flex-direction: column;
+        }
+
+        .btn {
+            width: 100%;
+        }
+    }
+</style>
+
+<div class="container">
+    <div class="inventario-header">
+        <h1 class="inventario-title">📦 Gestión de Inventario</h1>
+        <p class="inventario-subtitle">Control de movimientos de stock en tu tienda.</p>
+        <div class="inventario-actions">
+            <a href="{% url 'admin_panel' %}" class="btn btn-primary">← Volver al Panel</a>
+            <a href="{% url 'home' %}" class="btn btn-secondary">🏠 Inicio</a>
+        </div>
+    </div>
+
+    {% if movimientos %}
+    <div class="filters-section">
+        <h3 style="margin-bottom: 1rem; color: #722f37;">Filtros</h3>
+        <div class="filters-group">
+            <div class="filter-input">
+                <label for="filtro-tipo">Tipo de Movimiento:</label>
+                <select id="filtro-tipo" onchange="filtrarInventario()">
+                    <option value="">Todos</option>
+                    <option value="entrada">Entrada</option>
+                    <option value="salida">Salida</option>
+                    <option value="ajuste">Ajuste</option>
+                </select>
+            </div>
+            <div class="filter-input">
+                <label for="filtro-producto">Buscar Producto:</label>
+                <input type="text" id="filtro-producto" placeholder="Nombre del producto..." onkeyup="filtrarInventario()">
+            </div>
+        </div>
+    </div>
+
+    <div class="inventario-table">
+        <table id="tabla-inventario">
+            <thead>
+                <tr>
+                    <th>Producto</th>
+                    <th>Tipo de Movimiento</th>
+                    <th>Cantidad Anterior</th>
+                    <th>Cantidad Nueva</th>
+                    <th>Cambio</th>
+                    <th>Motivo</th>
+                    <th>Responsable</th>
+                    <th>Fecha</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for movimiento in movimientos %}
+                <tr class="fila-movimiento" data-tipo="{{ movimiento.get_tipo_movimiento_display|lower }}" data-producto="{{ movimiento.producto.nombre|lower }}">
+                    <td><strong>{{ movimiento.producto.nombre }}</strong></td>
+                    <td>
+                        <span class="movimiento-{{ movimiento.tipo_movimiento }}">
+                            {{ movimiento.get_tipo_movimiento_display }}
+                        </span>
+                    </td>
+                    <td>{{ movimiento.cantidad_anterior }}</td>
+                    <td>{{ movimiento.cantidad_nueva }}</td>
+                    <td>
+                        {% with cambio=movimiento.cantidad_nueva|subtract:movimiento.cantidad_anterior %}
+                        {% if cambio > 0 %}
+                        <span class="stock-positivo">+{{ cambio }}</span>
+                        {% elif cambio < 0 %}
+                        <span class="stock-negativo">{{ cambio }}</span>
+                        {% else %}
+                        <span>—</span>
+                        {% endif %}
+                        {% endwith %}
+                    </td>
+                    <td>{{ movimiento.motivo|truncatewords:3 }}</td>
+                    <td>{{ movimiento.responsable.username }}</td>
+                    <td><span class="fecha-badge">{{ movimiento.fecha|date:"d/m/Y H:i" }}</span></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        function filtrarInventario() {
+            const filtroTipo = document.getElementById('filtro-tipo').value.toLowerCase();
+            const filtroProducto = document.getElementById('filtro-producto').value.toLowerCase();
+            const filas = document.querySelectorAll('.fila-movimiento');
+
+            filas.forEach(fila => {
+                const tipo = fila.getAttribute('data-tipo');
+                const producto = fila.getAttribute('data-producto');
+
+                const coincideTipo = !filtroTipo || tipo === filtroTipo;
+                const coincideProducto = !filtroProducto || producto.includes(filtroProducto);
+
+                fila.style.display = coincideTipo && coincideProducto ? '' : 'none';
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const tabla = document.getElementById('tabla-inventario');
+            if (tabla) {
+                const filas = Array.from(tabla.querySelectorAll('tbody tr'));
+                filas.sort((a, b) => {
+                    const fechaA = new Date(a.querySelector('td:last-child').textContent);
+                    const fechaB = new Date(b.querySelector('td:last-child').textContent);
+                    return fechaB - fechaA;
+                });
+                const tbody = tabla.querySelector('tbody');
+                filas.forEach(fila => tbody.appendChild(fila));
+            }
+        });
+    </script>
+
+    {% else %}
+    <div class="inventario-table">
+        <div class="empty-state">
+            <div class="empty-state-icon">📭</div>
+            <div class="empty-state-text">No hay movimientos de inventario</div>
+            <div class="empty-state-subtext">Los movimientos aparecerán aquí cuando realices transacciones</div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+{% endblock %}
