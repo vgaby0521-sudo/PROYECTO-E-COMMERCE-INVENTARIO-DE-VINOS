@@ -272,22 +272,4 @@ El sitio está completamente optimizado para:
 
 ---
 
-## 📧 Contacto y Soporte
 
-Para reportar bugs o sugerir mejoras, contacta a:
-- Email: `info@wineshop.com`
-- Teléfono: `+1 (555) 123-4567`
-
----
-
-## 📝 Licencia
-
-Este proyecto es de código abierto y está disponible bajo la licencia MIT.
-
----
-
-## 🎉 ¡Bienvenido a Wine Shop!
-
-Disfruta de los mejores vinos del mundo desde la comodidad de tu hogar. 🍇🍷
-
-**Hecho con ❤️ usando Django, HTML, CSS y JavaScript**
